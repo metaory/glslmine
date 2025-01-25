@@ -11,7 +11,7 @@ const mkLink = (id) => {
     link.title = id
     
     const img = document.createElement('img')
-    img.src = `/dump/${id}.png`
+    img.src = `/glslmine/dump/${id}.png`
     img.loading = 'lazy'
     img.alt = id
     
@@ -24,6 +24,7 @@ const mkLink = (id) => {
 
 const mkLinks = (links) => links.forEach(mkLink)
 
-fetch('/files.json')
+fetch('/glslmine/files.json')
   .then(r => r.json())
   .then(mkLinks)
+  .catch(err => console.warn('Failed to load gallery:', err))

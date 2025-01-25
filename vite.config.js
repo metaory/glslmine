@@ -2,7 +2,7 @@ import { defineConfig } from 'vite'
 import fs from 'node:fs'
 
 const writeFileList = () => {
-  const files = fs.readdirSync('dump')
+  const files = fs.readdirSync('public/dump')
     .filter(f => f.endsWith('.png'))
     .map(f => f.replace('.png', ''))
     .sort((a, b) => Number(a) - Number(b))
