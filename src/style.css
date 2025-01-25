@@ -39,7 +39,7 @@ body {
 }
 
 #app {
-  max-width: min(98vw, 1400px);
+  max-width: 100vw;
   padding: 2rem;
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
@@ -50,8 +50,6 @@ body {
   display: block;
   border-radius: 0.75rem;
   overflow: hidden;
-  transition: transform 0.1s, opacity 0.1s;
-  opacity: 0.6;
   background: black;
   outline: 6px solid black;
   outline-offset: -4px;
@@ -59,9 +57,7 @@ body {
 }
 
 .thumb:hover {
-  transform: scale(1.02);
-  border-color: var(--accent);
-  opacity: 1;
+  outline-color: var(--accent);
 }
 
 .thumb img {
