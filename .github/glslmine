@@ -1,0 +1,66 @@
+#!/bin/bash
+# shellcheck disable=SC2154
+set -euo pipefail
+
+# Usage: glslmine [start=1] [end=3] [jobs=4]
+#   start and end can be the same for single page download
+#   e.g: glslmine 5 5 8  # downloads page 5 using 8 parallel jobs
+
+beg=${1:-1} end=${2:-3} num=${3:-4}
+url="https://glslsandbox.com"
+out="dump"
+
+for i in {0..7}; do
+  eval "c$i=\$'\e[3${i}m'"
+done
+c_=$'\e[0m'
+
+mkdir -p "$out" &>/dev/null
+now=$(date +%s)
+
+job() {
+  local idx=$1 src=$2
+  local t_0
+  t_0=$(date +%s)
+
+  if ! curl -s -f -o "$out/${src##*/}" "${url}${src}"; then
+    echo -e "${c1}Failed to download: ${url}${src}${c_}" >&2
+    return 1
+  fi
+
+  local t_1 dif sum
+  t_1=$(date +%s)
+  dif=$((t_1 - t_0))
+  sum=$((t_1 - now))
+
+  local num
+  read -r num < <(find "$out" -type f | wc -l)
+
+  printf " ${c6}%-6s ${c3}%-15s ${c2}%-6s ${c5}%6ds ${c4}%4dm%02ds ${c_}\n" \
+    "$idx" "${src##*/}" "$(printf "%04d" "$num")" "$dif" "$((sum/60))" "$((sum%60))"
+}
+
+export -f job
+export now url out c{0..7} c_
+
+# Table header
+echo -e "${c6} PAGE   ${c3} FILE            ${c2} JOB    ${c5} TIME   ${c4} TOTAL"
+
+# Process pages
+for ((i = beg; i <= end; i++)); do
+  uri="${url}/?page=${i}"
+  echo -e "${c3} ${i} ${c7}···"
+  curl -s -f "$uri" |
+    sed -E '/thumb/!d;s/.*src=.(.*).png.*/\1.png/' |
+    parallel --halt soon,fail=1 -j"$num" --line-buffer "job $i {}" || {
+    echo -e "${c1}Failed processing page $i${c_}" >&2
+    continue
+  }
+done
+
+
+# Final stats
+end=$(date +%s)
+printf "${c4}Total runtime: %dm%02ds${c_}\n" "$(((end - now)/60))" "$(((end - now)%60))"
+
+# vim: ft=bash

@@ -1,0 +1,82 @@
+:root {
+  --bg: #110022;
+  --fg: #eeaaff;
+  --accent: #4400ff;
+}
+
+* {
+  scrollbar-width: thin;
+  scrollbar-color: var(--accent) var(--bg);
+}
+
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--bg);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--accent);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: crimson;
+}
+
+body {
+  margin: 0;
+  display: grid;
+  place-items: center;
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'Pixelify Sans', system-ui;
+  min-height: 100vh;
+  overflow-x: hidden;
+}
+
+#app {
+  max-width: min(98vw, 1400px);
+  padding: 2rem;
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 1rem;
+}
+
+.thumb {
+  display: block;
+  border-radius: 0.75rem;
+  overflow: hidden;
+  transition: transform 0.1s, opacity 0.1s;
+  opacity: 0.6;
+  background: black;
+  outline: 6px solid black;
+  outline-offset: -4px;
+  position: relative;
+}
+
+.thumb:hover {
+  transform: scale(1.02);
+  border-color: var(--accent);
+  opacity: 1;
+}
+
+.thumb img {
+  width: 100%;
+  height: auto;
+  display: block;
+}
+
+.thumb span {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  font-family: 'Pixelify Sans', monospace;
+  font-size: 2.2rem;
+  color: cyan;
+  mix-blend-mode: difference;
+}

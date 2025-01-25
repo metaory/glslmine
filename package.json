@@ -1,0 +1,18 @@
+{
+  "name": "glslmine",
+  "private": true,
+  "version": "0.0.1",
+  "type": "module",
+  "homepage": "https://metaory.github.io/glslmine/",
+  "scripts": {
+    "dev": "vite",
+    "build": "vite build --base=/glslmine/",
+    "preview": "vite preview"
+  },
+  "devDependencies": {
+    "vite": "^6.0.5"
+  },
+  "dependencies": {
+    "@fontsource/pixelify-sans": "^5.1.1"
+  }
+}

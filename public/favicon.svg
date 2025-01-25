@@ -1,0 +1,24 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg
+  viewBox="0 0 100 100"
+  xmlns="http://www.w3.org/2000/svg">
+  <rect
+    fill="#33ff00"
+    width="80"
+    height="80"
+    x="10"
+    y="10"
+    rx="0"
+    ry="0" />
+  <text
+    x="50"
+    y="50"
+    id="glitch"
+    font-family="monospace"
+    font-size="75"
+    text-anchor="middle"
+    dominant-baseline="middle"
+    stroke-width="4"
+    stroke="#000000"
+    fill="#000000">⬔</text>
+</svg>

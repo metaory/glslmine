@@ -1,0 +1,168 @@
+<svg xmlns="http://www.w3.org/2000/svg"
+     viewBox="0 0 306 32" >
+      <!-- made with glitcher-cli v0.7
+        █▀▀ █░░ █ ▀█▀ █▀▀ █░█ █▀▀ █▀█
+        █▄█ █▄▄ █ ░█░ █▄▄ █▀█ ██▄ █▀▄
+      https://github.com/metaory/glitcher-cli -->
+      <!-- <style> svg { background-color: indigo; } </style> -->
+      
+      <text filter="url(#glitch)"
+            fill="#FFFFFF"
+            font-family="monospace, serif"
+            font-weight="bolder"
+            font-size="x-large"
+            text-anchor="middle"
+            lengthAdjust="spacingAndGlyphs"
+            textLength="70%"
+            dominant-baseline="mathematical"
+            x="50%" y="30%"
+      >⬔ glsl̶̶m̶̶i̶̶n̶̶e</text>
+      <defs>
+      <filter id="glitch"
+              primitiveUnits="objectBoundingBox"
+              x="0%"
+              y="0%"
+              height="100%">
+          <feColorMatrix in="SourceGraphic"
+                         result="red"
+                         type="matrix"
+                         values="1 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 1 0" />
+          <feColorMatrix in="SourceGraphic"
+                         result="green"
+                         type="matrix"
+                         values="0 0 0 0 0 0 1 0 0 0 0 0 0 0 0 0 0 0 1 0" />
+          <feColorMatrix in="SourceGraphic"
+                         result="blue"
+                         type="matrix"
+                         values="0 0 0 0 0 0 0 0 0 0 0 0 1 0 0 0 0 0 1 0" />
+          <feOffset in="red"
+                    result="red-shifted"
+                    dx="-0.01"
+                    dy="0">
+          <animate attributeName="dx"
+                   keyTimes="0; 0.10; 0.63; 0.67; 0.68; 0.70; 0.81"
+                   values="-0.01; -0.01; -0.01; -0.00; -0.01; -0.01; 0.01"
+                   begin="0"
+                   dur="57.45s"
+                   calcMode="discrete"
+                   repeatCount="indefinite"
+                   fill="freeze" />
+            </feOffset>
+            <feOffset in="blue"
+                      result="blue-shifted"
+                      dx="0.01"
+                      dy="0">
+                <animate attributeName="dx"
+                         keyTimes="0; 0.14; 0.29; 0.38; 0.47; 0.57; 0.68; 0.71; 0.74; 0.75; 0.78; 0.79"
+                         values="0.01; 0.01; -0.01; 0.01; -0.00; 0.01; 0.00; -0.01; -0.01; -0.01; -0.01; -0.00"
+                         begin="0"
+                         dur="57.20s"
+                         calcMode="discrete"
+                         repeatCount="indefinite"
+                         fill="freeze" />
+            </feOffset>
+            <feBlend mode="screen"
+                     in="red-shifted"
+                     in2="green"
+                     result="red-green" />
+            <feBlend mode="screen"
+                     in="red-green"
+                     in2="blue-shifted"
+                     result="blended" />
+    <feOffset in="blended"
+              dx="0"
+              dy="0"
+              y="0%"
+              height="22.64%"
+              result="slice_1a" />
+    <feOffset in="blended"
+              dx="0"
+              dy="0"
+              y="22.64%"
+              height="14.88%"
+              result="slice_1b">
+        <animate attributeName="dx"
+                 keyTimes="0; 0.11; 0.16; 0.39; 0.51; 0.72; 0.74; 0.89"
+                 values="-0.01; -0.00; 0.01; 0.01; 0.01; 0.01; 0.01; 0.00"
+                 begin="0s"
+                 dur="36.40s"
+                 calcMode="discrete"
+                 repeatCount="indefinite"
+                 fill="freeze" />
+    </feOffset>
+    <feOffset in="blended"
+              dx="0"
+              dy="0"
+              y="37%"
+              height="20.87%"
+              result="slice_2a" />
+    <feOffset in="blended"
+              dx="0"
+              dy="0"
+              y="57.87%"
+              height="6.88%"
+              result="slice_2b">
+        <animate attributeName="dx"
+                 keyTimes="0; 0.09; 0.14; 0.26; 0.48; 0.66; 0.71; 0.76; 0.86; 0.87"
+                 values="0.01; -0.01; 0.00; -0.00; 0.01; -0.00; 0.01; -0.00; -0.00; 0.01"
+                 begin="0s"
+                 dur="58.34s"
+                 calcMode="discrete"
+                 repeatCount="indefinite"
+                 fill="freeze" />
+    </feOffset>
+    <feOffset in="blended"
+              dx="0"
+              dy="0"
+              y="64%"
+              height="14.47%"
+              result="slice_3a" />
+    <feOffset in="blended"
+              dx="0"
+              dy="0"
+              y="78.47%"
+              height="13.12%"
+              result="slice_3b">
+        <animate attributeName="dx"
+                 keyTimes="0; 0.09; 0.25; 0.37; 0.41; 0.50; 0.55; 0.60; 0.62; 0.66"
+                 values="0.01; -0.01; -0.01; -0.00; -0.00; -0.00; 0.01; 0.01; 0.00; 0.01"
+                 begin="0s"
+                 dur="39.44s"
+                 calcMode="discrete"
+                 repeatCount="indefinite"
+                 fill="freeze" />
+    </feOffset>
+    <feOffset in="blended"
+              dx="0"
+              dy="0"
+              y="91%"
+              height="10.30%"
+              result="slice_4a" />
+    <feOffset in="blended"
+              dx="0"
+              dy="0"
+              y="101.30%"
+              height="9.66%"
+              result="slice_4b">
+        <animate attributeName="dx"
+                 keyTimes="0; 0.31; 0.32; 0.34; 0.78; 0.87; 0.91"
+                 values="0.00; -0.01; -0.00; 0.01; -0.01; 0.01; -0.01"
+                 begin="0s"
+                 dur="55.04s"
+                 calcMode="discrete"
+                 repeatCount="indefinite"
+                 fill="freeze" />
+    </feOffset>
+    <feMerge>
+        <feMergeNode in="slice_1a" />
+        <feMergeNode in="slice_1b" />
+        <feMergeNode in="slice_2a" />
+        <feMergeNode in="slice_2b" />
+        <feMergeNode in="slice_3a" />
+        <feMergeNode in="slice_3b" />
+        <feMergeNode in="slice_4a" />
+        <feMergeNode in="slice_4b" />
+    </feMerge>
+    </filter>
+    </defs>
+</svg>
