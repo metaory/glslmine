@@ -2,6 +2,7 @@ import './style.css'
 import '@fontsource/pixelify-sans/400.css';
 
 const app = document.getElementById('app')
+const base = import.meta.env.DEV ? '' : '/glslmine'
 
 const mkLink = (id) => {
     const link = document.createElement('a')
@@ -11,7 +12,7 @@ const mkLink = (id) => {
     link.title = id
     
     const img = document.createElement('img')
-    img.src = `/glslmine/dump/${id}.png`
+    img.src = `${base}/dump/${id}.png`
     img.loading = 'lazy'
     img.alt = id
     
@@ -24,7 +25,7 @@ const mkLink = (id) => {
 
 const mkLinks = (links) => links.forEach(mkLink)
 
-fetch('/glslmine/files.json')
+fetch(`${base}/files.json`)
   .then(r => r.json())
   .then(mkLinks)
   .catch(err => console.warn('Failed to load gallery:', err))
