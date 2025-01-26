@@ -1,0 +1,41 @@
+{
+  "name": "glslmine",
+  "short_name": "glslmine",
+  "description": "Shader collection hub",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#110022",
+  "theme_color": "#110022",
+  "icons": [
+    {
+      "src": "/icon-16.svg",
+      "sizes": "16x16",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-32.svg", 
+      "sizes": "32x32",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/icon-48.svg",
+      "sizes": "48x48", 
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/apple-touch-icon.svg",
+      "sizes": "180x180",
+      "type": "image/svg+xml",
+      "purpose": "any"
+    },
+    {
+      "src": "/favicon.svg",
+      "sizes": "500x500",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+} 
