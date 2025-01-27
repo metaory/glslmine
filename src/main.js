@@ -126,15 +126,17 @@ const renderShaders = () => {
   progress.append(progressBar, progressInfo)
   app.append(progress, thumbs)
 
-  // Only render visible elements initially
   const shaders = filterShaders(getShaders())
-  const batchSize = Math.ceil((window.innerHeight / 160) * (window.innerWidth / 160))
+  const batchSize = Math.ceil((window.innerHeight / 160) * (window.innerWidth / 160) * 3)
   
   let currentIndex = 0
+  let isLoading = false
+  let lastScrollY = window.scrollY
   
   const loadMoreItems = () => {
-    if (currentIndex >= shaders.length) return false
+    if (currentIndex >= shaders.length || isLoading) return false
     
+    isLoading = true
     const nextBatch = shaders.slice(currentIndex, currentIndex + batchSize)
     nextBatch.forEach(id => {
       const thumb = mkLink(id)
@@ -144,42 +146,55 @@ const renderShaders = () => {
     })
     currentIndex += nextBatch.length
     updateProgress()
+    isLoading = false
     return true
   }
 
-  // Update progress
   const updateProgress = () => {
     const progress = (currentIndex / shaders.length) * 100
     progressBar.style.height = `${progress}%`
     progressInfo.textContent = `${currentIndex}/${shaders.length} (${Math.round(progress)}%)`
   }
 
-  // Initial load
+  // Initial loads
+  loadMoreItems()
   loadMoreItems()
 
-  // Check if we need to load more to enable scrolling
   const ensureScroll = () => {
     const hasScroll = document.documentElement.scrollHeight > window.innerHeight
-    if (!hasScroll) {
-      loadMoreItems() && setTimeout(ensureScroll, 100)
+    if (!hasScroll && !isLoading) {
+      loadMoreItems() && setTimeout(ensureScroll, 50)
     }
   }
-  setTimeout(ensureScroll, 100)
+  setTimeout(ensureScroll, 50)
 
-  // Scroll handler for both directions
+  let scrollLock = false
+  let scrollTimer = null
+
   const onScroll = () => {
+    if (scrollLock) return
+    
     const scrolled = window.scrollY
     const viewportHeight = window.innerHeight
     const totalHeight = document.documentElement.scrollHeight
+    const scrollDelta = scrolled - lastScrollY
+    lastScrollY = scrolled
     
+    // Detect rapid direction changes
+    if (Math.abs(scrollDelta) > viewportHeight / 2) {
+      return // Skip this scroll event
+    }
+
     // Load more at bottom
-    if (scrolled + viewportHeight > totalHeight - 1000) {
+    if (scrolled + viewportHeight > totalHeight - 2000) {
       loadMoreItems()
     }
     
-    // Load more at top if scrolled up
-    if (scrolled < 500 && currentIndex > batchSize) {
-      const prevBatch = shaders.slice(Math.max(0, currentIndex - batchSize * 2), currentIndex - batchSize)
+    // Load more when scrolling up - trigger when moving up at any position
+    if (scrollDelta < -100 && currentIndex > batchSize && !isLoading) {
+      scrollLock = true
+      
+      const prevBatch = shaders.slice(Math.max(0, currentIndex - batchSize * 3), currentIndex - batchSize)
       const fragment = document.createDocumentFragment()
       
       prevBatch.forEach(id => {
@@ -189,13 +204,26 @@ const renderShaders = () => {
         observer.observe(thumb)
       })
       
-      // Insert at top and adjust scroll
       const firstThumb = thumbs.querySelector('.thumb')
       if (firstThumb) {
         const oldHeight = firstThumb.offsetTop
         thumbs.insertBefore(fragment, firstThumb)
-        const newHeight = thumbs.querySelector('.thumb').offsetTop
-        window.scrollBy(0, newHeight - oldHeight)
+        
+        // Delay scroll adjustment to next frame
+        requestAnimationFrame(() => {
+          const newHeight = thumbs.querySelector('.thumb').offsetTop
+          const adjustment = newHeight - oldHeight
+          if (Math.abs(adjustment) < viewportHeight) {
+            window.scrollBy(0, adjustment)
+          }
+          
+          // Release lock after a short delay
+          setTimeout(() => {
+            scrollLock = false
+          }, 100)
+        })
+      } else {
+        scrollLock = false
       }
       
       currentIndex -= prevBatch.length
@@ -203,20 +231,24 @@ const renderShaders = () => {
     }
   }
 
-  // Throttle scroll handler
-  let scrollTimeout
+  // Improved scroll handler with better throttling
   window.addEventListener('scroll', () => {
-    if (!scrollTimeout) {
-      scrollTimeout = setTimeout(() => {
-        onScroll()
-        scrollTimeout = null
-      }, 100)
+    if (scrollTimer !== null) {
+      clearTimeout(scrollTimer)
     }
+    scrollTimer = setTimeout(() => {
+      scrollTimer = null
+      onScroll()
+    }, 50)
   })
 
   // Handle window resize
+  let resizeTimer = null
   window.addEventListener('resize', () => {
-    ensureScroll()
+    if (resizeTimer !== null) {
+      clearTimeout(resizeTimer)
+    }
+    resizeTimer = setTimeout(ensureScroll, 100)
   })
 }
 
