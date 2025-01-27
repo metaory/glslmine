@@ -80,15 +80,25 @@ const createProgress = () => {
 const createObserver = onIntersect => new IntersectionObserver(
   entries => entries.forEach(entry => {
     const thumb = entry.target
-    if (!entry.isIntersecting && thumb.parentNode?.classList.contains('thumbs')) {
-      thumb.remove()
-      elementPool.add(thumb)
+    if (!entry.isIntersecting) {
+      // Only remove if far out of view (both up and down)
+      const rect = thumb.getBoundingClientRect()
+      const viewportHeight = window.innerHeight
+      const isFarFromView = rect.top < -viewportHeight * 2 || rect.bottom > viewportHeight * 3
+      
+      if (isFarFromView && thumb.parentNode?.classList.contains('thumbs')) {
+        thumb.remove()
+        elementPool.add(thumb)
+        onIntersect(thumb)
+      }
     } else {
       thumb.style.opacity = '1'
     }
-    if (!entry.isIntersecting) onIntersect(thumb)
   }), 
-  { rootMargin: '100% 0px', threshold: 0.1 }
+  { 
+    rootMargin: '200% 0px', // Increased buffer zone
+    threshold: 0.1 
+  }
 )
 
 const debounce = (fn, ms = 100) => {
@@ -120,9 +130,17 @@ const filterShaders = shaders => {
 }
 
 const renderShaders = () => {
-  app.querySelector('.thumbs')?.remove()
+  const existingThumbs = app.querySelector('.thumbs')
+  const existingProgress = app.querySelector('.progress')
+  
+  if (existingThumbs) {
+    existingThumbs.remove()
+    existingProgress?.remove()
+  } else {
+    app.innerHTML = ''
+  }
+  
   elementPool.clear()
-  app.innerHTML = ''
 
   const thumbs = createElement('div', {
     className: 'thumbs',
@@ -134,49 +152,79 @@ const renderShaders = () => {
   
   const shaders = filterShaders(getShaders())
   const batchSize = calcBatchSize()
-  let currentIndex = 0
+  let startIndex = 0
+  let endIndex = 0
   let isLoading = false
   
   const observer = createObserver(thumb => observer.unobserve(thumb))
   
-  const loadMoreItems = () => {
-    if (!thumbs || currentIndex >= shaders.length || isLoading) return false
+  const loadMore = (direction = 1) => {
+    if (isLoading) return false
+    if (direction > 0 && endIndex >= shaders.length) return false
+    if (direction < 0 && startIndex <= 0) return false
     
     isLoading = true
-    const validThumbs = shaders
-      .slice(currentIndex, currentIndex + batchSize)
+    
+    let itemsToLoad
+    if (direction > 0) {
+      itemsToLoad = shaders.slice(endIndex, endIndex + batchSize)
+      endIndex = Math.min(shaders.length, endIndex + batchSize)
+    } else {
+      const newStart = Math.max(0, startIndex - batchSize)
+      itemsToLoad = shaders.slice(newStart, startIndex)
+      startIndex = newStart
+    }
+    
+    const oldHeight = thumbs.scrollHeight
+    const oldScroll = window.scrollY
+    
+    const validThumbs = itemsToLoad
       .map(mkLink)
       .filter(thumb => thumb instanceof Element)
     
     validThumbs.forEach(thumb => {
       thumb.style.opacity = '0'
-      thumbs.appendChild(thumb)
+      if (direction < 0) {
+        thumbs.insertBefore(thumb, thumbs.firstChild)
+      } else {
+        thumbs.appendChild(thumb)
+      }
       observer.observe(thumb)
     })
     
-    currentIndex += validThumbs.length
-    progress.update(currentIndex, shaders.length)
+    if (direction < 0 && validThumbs.length) {
+      const heightDiff = thumbs.scrollHeight - oldHeight
+      window.scrollTo(0, oldScroll + heightDiff)
+    }
+    
+    progress.update(endIndex, shaders.length)
     isLoading = false
+    
     return validThumbs.length > 0
   }
   
-  loadMoreItems()
-  loadMoreItems()
-  
-  const loadTriggerDistance = Math.max(1000, window.innerHeight)
-  const throttledScroll = () => {
-    if (isLoading) return
+  const handleScroll = () => {
     const { scrollY, innerHeight } = window
     const { scrollHeight } = document.documentElement
     
-    if (scrollY + innerHeight > scrollHeight - loadTriggerDistance) {
-      loadMoreItems()
+    // Near top - load previous
+    if (scrollY < innerHeight && startIndex > 0) {
+      loadMore(-1)
+    }
+    
+    // Near bottom - load next
+    if (scrollHeight - (scrollY + innerHeight) < innerHeight && endIndex < shaders.length) {
+      loadMore(1)
     }
   }
   
-  window.addEventListener('scroll', throttledScroll, { passive: true })
+  // Initial load
+  loadMore(1)
+  loadMore(1)
+  
+  window.addEventListener('scroll', handleScroll, { passive: true })
   return () => {
-    window.removeEventListener('scroll', throttledScroll)
+    window.removeEventListener('scroll', handleScroll)
     observer.disconnect()
   }
 }

@@ -11,7 +11,7 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --transition-fast: 0.1s;
-  --controls-height: 5rem;
+  --controls-height: 2rem;
 
   /* Color mixes */
   --bg-10: color-mix(in oklch, var(--bg) 10%, transparent);
@@ -73,12 +73,8 @@ html, body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background: var(--accent);
-  border-radius: var(--radius-sm);
-}
-
-::-webkit-scrollbar-thumb:hover {
   background: var(--accent2);
+  border-radius: var(--radius-sm);
 }
 
 body {
@@ -102,6 +98,7 @@ body {
 .controls {
   position: fixed;
   inset: 0 0 auto;
+  height: var(--controls-height);
   z-index: 10;
   padding: 1rem;
   display: grid;
@@ -114,8 +111,8 @@ body {
 
 .controls input,
 .controls select {
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-lg);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-md);
   background: var(--bg-10);
   color: var(--accent);
   border: none;
@@ -152,8 +149,8 @@ body {
 .range-container {
   display: flex;
   align-items: center;
-  padding: 0.5rem 0.75rem;
-  border-radius: var(--radius-lg);
+  padding: 0.35rem 0.5rem;
+  border-radius: var(--radius-md);
   background: var(--bg-10);
   backdrop-filter: blur(4px);
 }
@@ -164,26 +161,26 @@ body {
 
 input[type="range"] {
   width: 100%;
-  height: 12px;
+  height: 10px;
   background: var(--bg-20);
   -webkit-appearance: none;
   cursor: pointer;
-  border-radius: var(--radius-md);
+  border-radius: var(--radius-sm);
 }
 
 input[type="range"]::-webkit-slider-thumb {
   -webkit-appearance: none;
-  margin-top: 0px;
-  width: 22px;
+  margin-top: -2px;
+  width: 18px;
+  height: 18px;
   background: var(--accent);
-  height: 22px;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 #app {
   width: 100%;
   max-width: 100vw;
-  padding: 1rem 0;
+  padding: calc(var(--controls-height) + 3rem) 0 1rem;
   position: relative;
   z-index: 1;
   display: flex;
@@ -196,6 +193,7 @@ input[type="range"]::-webkit-slider-thumb {
   width: calc(100% - 2rem);
   max-width: 1800px;
   padding: 0 calc(1rem + var(--radius-lg));
+  margin-top: 0;
 }
 
 .thumb {
@@ -258,10 +256,10 @@ input[type="range"]::-webkit-slider-thumb {
 
 .progress {
   position: fixed;
-  top: calc(var(--controls-height) + var(--radius-sm));
+  top: calc(var(--controls-height) + 3rem);
   left: var(--radius-sm);
   width: 8px;
-  height: calc(100vh - var(--controls-height) - var(--radius-lg));
+  height: calc(100vh - var(--controls-height) - var(--radius-lg) - 3rem);
   background: var(--bg-30);
   border-radius: var(--radius-sm);
   z-index: 9;
@@ -358,7 +356,7 @@ input[type="range"]::-webkit-slider-thumb {
 
 @media (max-width: 768px) {
   :root {
-    --controls-height: 9rem;
+    --controls-height: 4rem;
   }
 
   .controls {
@@ -368,22 +366,22 @@ input[type="range"]::-webkit-slider-thumb {
     max-width: min(500px, 100%);
     margin: 0 auto;
   }
-  
+
   .controls input,
   .controls select,
   .range-container {
     width: 100%;
     box-sizing: border-box;
   }
-  
+
   #app {
-    padding-top: var(--controls-height);
+    padding-top: calc(var(--controls-height) + 3rem);
   }
-  
+
   .progress {
-    top: calc(var(--controls-height) + var(--radius-sm));
+    top: calc(var(--controls-height) + 3rem);
   }
-  
+
   .thumbs {
     padding: 0 0.75rem;
   }
