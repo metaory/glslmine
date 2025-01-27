@@ -1,31 +1,71 @@
-const createSignal = (initial) => {
+const createSignal = (initial, validate = v => v) => {
   const subscribers = new Set()
+  
+  const notify = value => {
+    for (const fn of subscribers) {
+      try {
+        fn(value)
+      } catch (err) {
+        console.warn('Subscriber error:', err)
+      }
+    }
+    return value
+  }
 
-  const proxy = new Proxy({ value: initial }, {
-    get: (target, prop) => target[prop],
+  const state = new Proxy({ value: validate(initial) }, {
+    get: (target, prop) => {
+      if (prop === 'value') return target[prop]
+      return undefined
+    },
     set: (target, prop, value) => {
-      target[prop] = value
-      subscribers.forEach(fn => fn(value))
-      return true
+      if (prop !== 'value') return false
+      try {
+        target[prop] = validate(value)
+        return notify(target[prop])
+      } catch (err) {
+        console.warn('Validation error:', err)
+        return false
+      }
     }
   })
 
-  return [
-    () => proxy.value,
-    (v) => proxy.value = v,
-    (fn) => subscribers.add(fn)
-  ]
+  function subscribe(fn) {
+    if (typeof fn !== 'function') return () => {}
+    subscribers.add(fn)
+    fn(state.value) // Initial call
+    function unsubscribe() {
+      subscribers.delete(fn)
+    }
+    return unsubscribe
+  }
+
+  function get() {
+    return state.value
+  }
+
+  function set(value) {
+    state.value = value
+  }
+
+  function dispose() {
+    subscribers.clear()
+    state.value = validate(initial)
+  }
+
+  return [get, set, subscribe, dispose]
 }
 
-const state = {
-  shaders: createSignal([]),
-  gridSize: createSignal(160),
-  filters: createSignal({
-    search: '',
-    source: 'all'
-  })
-}
+const validateShaders = shaders => 
+  Array.isArray(shaders) ? shaders : []
 
-export const [getShaders, setShaders, onShaders] = state.shaders
-export const [getFilters, setFilters, onFilters] = state.filters
-export const [getGridSize, setGridSize, onGridSize] = state.gridSize
+const validateGridSize = size => 
+  Math.max(100, Math.min(300, Number(size) || 160))
+
+const validateFilters = filters => ({
+  search: String(filters?.search || ''),
+  source: String(filters?.source || 'all')
+})
+
+export const [getShaders, setShaders, onShaders, disposeShaders] = createSignal([], validateShaders)
+export const [getGridSize, setGridSize, onGridSize, disposeGridSize] = createSignal(160, validateGridSize)
+export const [getFilters, setFilters, onFilters, disposeFilters] = createSignal({ search: '', source: 'all' }, validateFilters)

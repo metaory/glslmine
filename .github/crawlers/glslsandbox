@@ -2,13 +2,14 @@
 # shellcheck disable=SC2154
 set -euo pipefail
 
-# Usage: glslmine [start=1] [end=3] [jobs=4]
+# Usage: glslsandbox [start=1] [end=3] [jobs=4]
 #   start and end can be the same for single page download
-#   e.g: glslmine 5 5 8  # downloads page 5 using 8 parallel jobs
+#   e.g: glslsandbox 5 5 8  # downloads page 5 using 8 parallel jobs
 
 beg=${1:-1} end=${2:-3} num=${3:-4}
 url="https://glslsandbox.com"
-out="dump"
+out="public/dump/glslsandbox"
+json="public/data/glslsandbox.json"
 
 for i in {0..7}; do
   eval "c$i=\$'\e[3${i}m'"
@@ -16,6 +17,7 @@ done
 c_=$'\e[0m'
 
 mkdir -p "$out" &>/dev/null
+mkdir -p "$(dirname "$json")" &>/dev/null
 now=$(date +%s)
 
 job() {
@@ -40,6 +42,30 @@ job() {
     "$idx" "${src##*/}" "$(printf "%04d" "$num")" "$dif" "$((sum/60))" "$((sum%60))"
 }
 
+generate_json() {
+  echo "Generating $json..."
+  echo "{" > "$json"
+  echo "  \"source\": \"glslsandbox\"," >> "$json"
+  echo "  \"updated\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"," >> "$json"
+  echo "  \"items\": [" >> "$json"
+  
+  find "$out" -type f -name "*.png" | sort -n | while read -r file; do
+    id=$(basename "$file" .png)
+    echo "    {" >> "$json"
+    echo "      \"id\": \"${id}\"," >> "$json"
+    echo "      \"thumb\": \"${url}/thumbs/${id}.png\"," >> "$json"
+    echo "      \"url\": \"${url}/e#${id}.0\"" >> "$json"
+    echo "    }," >> "$json"
+  done
+  
+  # Remove last comma and close array
+  sed -i '$ s/,$//' "$json"
+  echo "  ]" >> "$json"
+  echo "}" >> "$json"
+  
+  echo "Generated $json with $(jq '.items | length' "$json") entries"
+}
+
 export -f job
 export now url out c{0..7} c_
 
@@ -58,9 +84,11 @@ for ((i = beg; i <= end; i++)); do
   }
 done
 
+# Generate JSON listing
+generate_json
 
 # Final stats
 end=$(date +%s)
 printf "${c4}Total runtime: %dm%02ds${c_}\n" "$(((end - now)/60))" "$(((end - now)%60))"
 
-# vim: ft=bash
+# vim: ft=bash 

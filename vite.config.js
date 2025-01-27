@@ -1,23 +1,43 @@
 import { defineConfig } from 'vite'
 import fs from 'node:fs'
 
-const writeFileList = () => {
-  const files = fs.readdirSync('public/dump')
-    .filter(f => f.endsWith('.png'))
-    .map(f => f.replace('.png', ''))
-    .sort((a, b) => Number(a) - Number(b))
-    .map(id => ({
-      thumb: `https://glslsandbox.com/thumbs/${id}.png`,
-      url: `https://glslsandbox.com/e#${id}.0`
-    }))
-  
-  fs.writeFileSync('public/files.json', JSON.stringify(files))
+const pkg = JSON.parse(fs.readFileSync('./package.json', 'utf8'))
+
+const generateDataFile = () => {
+  const sources = ['glslsandbox'] // Add more sources here as we add them
+  const data = {
+    updated: new Date().toISOString(),
+    sources: {}
+  }
+
+  for (const source of sources) {
+    const paths = [`public/dump/${source}`, `public/data/${source}.json`]
+    if (!paths.every(fs.existsSync)) {
+      console.warn(`Warning: Missing data for ${source}`)
+      continue
+    }
+
+    try {
+      data.sources[source] = JSON.parse(fs.readFileSync(paths[1], 'utf8'))
+    } catch (err) {
+      console.error(`Error reading ${source} data:`, err)
+    }
+  }
+
+  fs.writeFileSync('public/data/index.json', JSON.stringify(data, null, 2))
 }
 
 export default defineConfig({
+  define: {
+    'import.meta.env.VITE_APP_VERSION': JSON.stringify(pkg.version)
+  },
   plugins: [{
-    name: 'dump-list',
-    buildStart: writeFileList,
-    handleHotUpdate: ({ file }) => file.includes('dump') && writeFileList()
+    name: 'generate-data',
+    buildStart: generateDataFile,
+    handleHotUpdate: ({ file }) => {
+      if (file.includes('/dump/') || file.includes('/data/')) {
+        generateDataFile()
+      }
+    }
   }]
 }) 

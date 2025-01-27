@@ -11,6 +11,7 @@
   --radius-md: 0.5rem;
   --radius-lg: 0.75rem;
   --transition-fast: 0.1s;
+  --controls-height: 5rem;
 
   /* Color mixes */
   --bg-10: color-mix(in oklch, var(--bg) 10%, transparent);
@@ -240,23 +241,27 @@ input[type="range"]::-webkit-slider-thumb {
   top: var(--radius-sm);
   right: var(--radius-sm);
   padding: var(--radius-sm);
-  border-radius: var(--radius-sm);
+  border-radius: var(--radius-lg);
   background: var(--bg-30);
   color: white;
   mix-blend-mode: overlay;
   font-weight: bold;
-  font-size: 0.8rem;
+  font-size: 0.7rem;
   backdrop-filter: blur(4px);
+  min-width: 1.8rem;
+  height: 1.5rem;
+  display: grid;
+  place-items: center;
   text-transform: uppercase;
-  letter-spacing: 0.05em;
+  letter-spacing: 0;
 }
 
 .progress {
   position: fixed;
-  top: 5rem;
+  top: calc(var(--controls-height) + var(--radius-sm));
   left: var(--radius-sm);
   width: 8px;
-  height: calc(100vh - 5rem - var(--radius-lg));
+  height: calc(100vh - var(--controls-height) - var(--radius-lg));
   background: var(--bg-30);
   border-radius: var(--radius-sm);
   z-index: 9;
@@ -292,7 +297,70 @@ input[type="range"]::-webkit-slider-thumb {
   transform: translateX(0);
 }
 
+.error {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-80);
+  color: var(--accent2);
+  font-size: 1.2rem;
+  text-align: center;
+  box-shadow: 0 0 30px var(--bg-90);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--accent2);
+  max-width: min(80vw, 600px);
+  z-index: 100;
+}
+
+.loading {
+  position: fixed;
+  inset: 50% auto auto 50%;
+  transform: translate(-50%, -50%);
+  padding: 2rem;
+  border-radius: var(--radius-lg);
+  background: var(--bg-80);
+  color: var(--accent);
+  font-size: 1.2rem;
+  text-align: center;
+  box-shadow: 0 0 30px var(--bg-90);
+  backdrop-filter: blur(10px);
+  border: 2px solid var(--accent);
+  max-width: min(80vw, 600px);
+  z-index: 100;
+  animation: pulse 2s ease-in-out infinite;
+}
+
+@keyframes pulse {
+  0%, 100% { opacity: 0.8; transform: translate(-50%, -50%) scale(1); }
+  50% { opacity: 1; transform: translate(-50%, -50%) scale(1.05); }
+}
+
+.version {
+  position: fixed;
+  bottom: var(--radius-sm);
+  right: var(--radius-sm);
+  padding: var(--radius-sm) var(--radius-md);
+  background: var(--bg-30);
+  color: var(--fg-50);
+  font-size: 0.7rem;
+  border-radius: var(--radius-sm);
+  backdrop-filter: blur(4px);
+  z-index: 10;
+  opacity: 0.7;
+  transition: opacity var(--transition-fast);
+}
+
+.version:hover {
+  opacity: 1;
+}
+
 @media (max-width: 768px) {
+  :root {
+    --controls-height: 9rem;
+  }
+
   .controls {
     grid-template-columns: 1fr;
     gap: 0.75rem;
@@ -309,11 +377,11 @@ input[type="range"]::-webkit-slider-thumb {
   }
   
   #app {
-    padding-top: 9rem;
+    padding-top: var(--controls-height);
   }
   
   .progress {
-    top: 9rem;
+    top: calc(var(--controls-height) + var(--radius-sm));
   }
   
   .thumbs {

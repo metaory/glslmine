@@ -1,0 +1,48 @@
+name: Crawl GLSL Sandbox
+
+on:
+  schedule:
+    - cron: '0 0 * * 1'  # Every Monday at 00:00 UTC
+  workflow_dispatch:
+    inputs:
+      pages:
+        description: 'Number of pages to crawl'
+        required: true
+        default: '5'
+        type: string
+      jobs:
+        description: 'Number of parallel jobs'
+        required: true
+        default: '8'
+        type: string
+
+permissions:
+  contents: write
+
+jobs:
+  crawl:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Install parallel
+        run: sudo apt-get install -y parallel
+      
+      - name: Run crawler
+        run: |
+          chmod +x .github/crawlers/glslsandbox
+          # Use input parameters if workflow_dispatch, otherwise use defaults
+          PAGES="${{ inputs.pages || '5' }}"
+          JOBS="${{ inputs.jobs || '8' }}"
+          .github/crawlers/glslsandbox 1 "$PAGES" "$JOBS"
+      
+      - name: Commit and push if changed
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add public/dump/glslsandbox public/data/glslsandbox.json
+          git diff --quiet && git diff --staged --quiet || (
+            git commit -m "Update GLSL Sandbox data (${PAGES} pages)" && 
+            git push
+          ) 

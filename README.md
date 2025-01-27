@@ -1,24 +1,27 @@
 <div align="center">
-    <img src="public/glslmine.svg" alt="glslmine" width="70%" />
+    <img src="public/glslmine.svg" alt="glslmine" height="40" />
     <br>
-    <i>
-        <small>
-            <a href="https://metaory.github.io/glslmine">metaory.github.io/glslmine</a>
-        </small>
-    </i>
+    <a href="https://metaory.github.io/glslmine">
+        <small><i>metaory.github.io/glslmine</i></small>
+    </a>
     <br>
-    <p>
-        A minimal, modern shader collection hub<br>
-        Browse, preview and explore GLSL shaders from various sources<br>
-        <small><em>glslsandbox • shadertoy • more coming soon</em></small>
-    </p>
+    <h2>Modern GLSL shader gallery</h2>
+</div>
+
+<div align="center">
+
+| Features | Sources |
+|:---:|:---:|
+| • Auto fetch | • GLSL Sandbox |
+| • Fast & minimal | • Shadertoy (..) |
+| • Smart filters | • Planned .. |
+</div>
+
+<div align="center">
     <img src="public/screenshot.png" alt="glslmine" width="100%" />
     <br>
-    <p>...</p>
-    <small><em>@1738000000</em></small>
-    <br>
-    <img src="public/favicon.svg" alt="glslmine" width="40%" />
-    <br>
-    <small><a href="LICENSE">MIT</a></small>
+    <img valign="middle" src="public/favicon.svg" alt="glslmine" width="20" />
+    <small><em>@1738000000</em> <a href="LICENSE">MIT</a></small>
 </div>
+
 

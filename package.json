@@ -1,7 +1,8 @@
 {
   "name": "glslmine",
   "private": true,
-  "version": "0.0.1",
+  "version": "0.2.1",
+  "description": "Modern GLSL shader gallery",
   "type": "module",
   "homepage": "https://metaory.github.io/glslmine/",
   "scripts": {
@@ -9,6 +10,14 @@
     "build": "vite build --base=/glslmine/",
     "preview": "vite preview"
   },
+  "keywords": [
+    "glsl",
+    "shader",
+    "gallery",
+    "webgl",
+    "vanilla-js",
+    "zero-deps"
+  ],
   "devDependencies": {
     "vite": "^6.0.5"
   },
