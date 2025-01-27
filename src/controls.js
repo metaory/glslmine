@@ -31,9 +31,6 @@ const source = document.createElement('select')
 source.innerHTML = `
   <option value="all">All Sources</option>
   <option value="glslsandbox">GLSL Sandbox</option>
-  <option value="shadertoy">ShaderToy</option>
-  <option value="vertexshader">Vertex Shader Art</option>
-  <option value="github">GitHub Gists</option>
 `
 source.value = getFilters().source
 

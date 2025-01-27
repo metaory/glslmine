@@ -99,11 +99,11 @@ body {
   z-index: 10;
   padding: 1rem;
   display: grid;
-  grid-template-columns: 2fr 4fr 1fr;
   gap: 1rem;
   background: var(--bg-60);
   box-shadow: 0 0 20px rgba(0,0,0,0.5);
   backdrop-filter: blur(20px);
+  grid-template-columns: 2fr 4fr 1fr;
 }
 
 .controls input,
@@ -285,4 +285,33 @@ input[type="range"]::-webkit-slider-thumb {
 .progress:hover .progress-info {
   opacity: 1;
   transform: translateX(0);
+}
+
+@media (max-width: 768px) {
+  .controls {
+    grid-template-columns: 1fr;
+    gap: 0.75rem;
+    padding: 1rem;
+    max-width: min(500px, 100%);
+    margin: 0 auto;
+  }
+  
+  .controls input,
+  .controls select,
+  .range-container {
+    width: 100%;
+    box-sizing: border-box;
+  }
+  
+  #app {
+    padding-top: 9rem;
+  }
+  
+  .progress {
+    top: 9rem;
+  }
+  
+  .thumbs {
+    padding: 0 0.75rem;
+  }
 }

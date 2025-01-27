@@ -23,59 +23,36 @@ const elementPool = {
   }
 }
 
-const mkLink = (id) => {
-  const [prefix, shaderID] = id.split('_')
-  
-  const sourceConfig = {
-    gs: {
-      url: `https://glslsandbox.com/e#${shaderID}.0`,
-      label: 'GLSL'
-    },
-    st: {
-      url: `https://www.shadertoy.com/view/${shaderID}`,
-      label: 'TOY'
-    },
-    vs: {
-      url: `https://www.vertexshaderart.com/art/${shaderID}`,
-      label: 'VERTEX'
-    },
-    gh: {
-      url: `https://gist.github.com/${shaderID}`,
-      label: 'GIST'
-    }
-  }
-
-  const config = sourceConfig[prefix] || sourceConfig.gs
-
+const mkLink = (shader) => {
   // Try to reuse existing element
   const existing = elementPool.get()
   if (existing) {
-    existing.href = config.url
-    existing.title = id
-    existing.querySelector('img').src = `${base}/dump/${id}.png`
-    existing.querySelector('span').textContent = shaderID
-    existing.querySelector('.source').textContent = config.label
+    existing.href = shader.url
+    existing.title = shader.url
+    existing.querySelector('img').src = shader.thumb
+    existing.querySelector('span').textContent = shader.url.split('#')[1]
+    existing.querySelector('.source').textContent = 'GLSL'
     return existing
   }
 
   // Create new if none available
   const link = document.createElement('a')
-  link.href = config.url
+  link.href = shader.url
   link.className = 'thumb'
   link.target = '_blank'
-  link.title = id
+  link.title = shader.url
   
   const img = document.createElement('img')
-  img.src = `${base}/dump/${id}.png`
+  img.src = shader.thumb
   img.loading = 'lazy'
-  img.alt = id
+  img.alt = shader.url
   
   const span = document.createElement('span')
-  span.textContent = shaderID
+  span.textContent = shader.url.split('#')[1]
   
   const source = document.createElement('div')
   source.className = 'source'
-  source.textContent = config.label
+  source.textContent = 'GLSL'
   
   link.append(img, span, source)
   return link
@@ -112,18 +89,9 @@ const observer = new IntersectionObserver((entries) => {
 
 const filterShaders = (shaders) => {
   const { search, source } = getFilters()
-  return shaders.filter(id => {
-    if (source !== 'all') {
-      const sourceMap = {
-        glslsandbox: 'gs',
-        shadertoy: 'st',
-        vertexshader: 'vs',
-        github: 'gh'
-      }
-      if (!id.startsWith(sourceMap[source])) return false
-    }
-    
-    if (search && !id.toLowerCase().includes(search.toLowerCase())) return false
+  return shaders.filter(shader => {
+    if (source !== 'all' && source !== 'glslsandbox') return false
+    if (search && !shader.url.toLowerCase().includes(search.toLowerCase())) return false
     return true
   })
 }
