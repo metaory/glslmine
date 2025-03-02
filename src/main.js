@@ -1,5 +1,5 @@
 import './style.css'
-import '@fontsource/pixelify-sans/400.css'
+import '@fontsource/pixelify-sans'
 import { getShaders, setShaders, getGridSize, onGridSize, getFilters, onFilters } from './state.js'
 import { initControls } from './controls.js'
 
