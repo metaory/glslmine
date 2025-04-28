@@ -19,7 +19,7 @@
     "zero-deps"
   ],
   "devDependencies": {
-    "vite": "^6.0.12"
+    "vite": "^6.0.15"
   },
   "dependencies": {
     "@fontsource/pixelify-sans": "^5.1.1"
