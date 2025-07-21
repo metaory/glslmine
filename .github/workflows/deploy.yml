@@ -3,6 +3,10 @@ name: Deploy to GitHub Pages
 on:
   push:
     branches: [master]
+    paths-ignore:
+      - 'README.md'
+      - 'LICENSE'
+      - '.github/workflows/crawl-glslsandbox.yml'
   workflow_dispatch:
 
 permissions:
@@ -40,6 +44,7 @@ jobs:
         run: npm install
       
       - name: Bump version
+        if: github.event_name == 'workflow_dispatch'
         run: |
           # Get and validate current version
           CURRENT_VERSION=$(jq -r '.version' package.json)
@@ -56,9 +61,9 @@ jobs:
           VERIFY_VERSION=$(jq -r '.version' package.json)
           [[ "$VERIFY_VERSION" == "$NEW_VERSION" ]] || { echo "Version update failed"; exit 1; }
           
-          # Commit and tag
+          # Commit and tag with [skip ci] to avoid triggering other workflows
           git commit -am "Bump version to $NEW_VERSION [skip ci]"
-          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION"
+          git tag -a "v$NEW_VERSION" -m "Release v$NEW_VERSION [skip ci]"
           git push origin HEAD:master --tags
           
           # Export for next steps
@@ -66,7 +71,7 @@ jobs:
       
       - name: Build
         env:
-          VITE_APP_VERSION: ${{ env.VERSION }}
+          VITE_APP_VERSION: ${{ env.VERSION || 'dev' }}
         run: npm run build
       
       - name: Setup Pages

@@ -18,10 +18,10 @@
 </div>
 
 <div align="center">
-    <img src="public/screenshot.png" alt="glslmine" width="100%" />
+    <img src="public/screenshot.jpg" alt="glslmine" width="100%" />
     <br>
     <img valign="middle" src="public/favicon.svg" alt="glslmine" width="20" />
-    <small><em>@1738000000</em> <a href="LICENSE">MIT</a></small>
+    <small><em>@1753000000</em> <a href="LICENSE">MIT</a></small>
 </div>
 
 

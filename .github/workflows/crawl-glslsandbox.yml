@@ -8,7 +8,7 @@ on:
       pages:
         description: 'Number of pages to crawl'
         required: true
-        default: '5'
+        default: '20'
         type: string
       jobs:
         description: 'Number of parallel jobs'
@@ -33,7 +33,7 @@ jobs:
         run: |
           chmod +x .github/crawlers/glslsandbox
           # Use input parameters if workflow_dispatch, otherwise use defaults
-          PAGES="${{ inputs.pages || '5' }}"
+          PAGES="${{ inputs.pages || '20' }}"
           JOBS="${{ inputs.jobs || '8' }}"
           .github/crawlers/glslsandbox 1 "$PAGES" "$JOBS"
       

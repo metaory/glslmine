@@ -1,94 +1,93 @@
 #!/bin/bash
-# shellcheck disable=SC2154
 set -euo pipefail
 
 # Usage: glslsandbox [start=1] [end=3] [jobs=4]
-#   start and end can be the same for single page download
-#   e.g: glslsandbox 5 5 8  # downloads page 5 using 8 parallel jobs
-
 beg=${1:-1} end=${2:-3} num=${3:-4}
 url="https://glslsandbox.com"
 out="public/dump/glslsandbox"
 json="public/data/glslsandbox.json"
 
-for i in {0..7}; do
-  eval "c$i=\$'\e[3${i}m'"
-done
-c_=$'\e[0m'
+# Colors
+c1=$'\e[31m' c2=$'\e[32m' c3=$'\e[33m' c6=$'\e[36m' c_=$'\e[0m'
 
-mkdir -p "$out" &>/dev/null
-mkdir -p "$(dirname "$json")" &>/dev/null
-now=$(date +%s)
+mkdir -p "$out" "$(dirname "$json")"
+start_time=$(date +%s)
 
 job() {
   local idx=$1 src=$2
-  local t_0
-  t_0=$(date +%s)
-
-  if ! curl -s -f -o "$out/${src##*/}" "${url}${src}"; then
-    echo -e "${c1}Failed to download: ${url}${src}${c_}" >&2
-    return 1
+  local shader_id="${src##*/}"
+  shader_id="${shader_id%.png}"
+  
+  # Skip if exists
+  if [[ -f "$out/$shader_id.png" ]]; then
+    printf " ${c6}%-6s ${c3}%-15s ${c2}SKIP${c_}\n" "$idx" "$shader_id.png"
+    return 0
   fi
 
-  local t_1 dif sum
-  t_1=$(date +%s)
-  dif=$((t_1 - t_0))
-  sum=$((t_1 - now))
-
-  local num
-  read -r num < <(find "$out" -type f | wc -l)
-
-  printf " ${c6}%-6s ${c3}%-15s ${c2}%-6s ${c5}%6ds ${c4}%4dm%02ds ${c_}\n" \
-    "$idx" "${src##*/}" "$(printf "%04d" "$num")" "$dif" "$((sum/60))" "$((sum%60))"
+  # Download
+  if curl -s -f -o "$out/${src##*/}" "${url}${src}"; then
+    local count=$(find "$out" -type f | wc -l)
+    printf " ${c6}%-6s ${c3}%-15s ${c2}%04d${c_}\n" "$idx" "${src##*/}" "$count"
+    echo "new" >> /tmp/glsl_found_new
+  else
+    echo -e "${c1}Failed: ${url}${src}${c_}" >&2
+    return 1
+  fi
 }
 
 generate_json() {
   echo "Generating $json..."
-  echo "{" > "$json"
-  echo "  \"source\": \"glslsandbox\"," >> "$json"
-  echo "  \"updated\": \"$(date -u +"%Y-%m-%dT%H:%M:%SZ")\"," >> "$json"
-  echo "  \"items\": [" >> "$json"
   
   find "$out" -type f -name "*.png" | sort -n | while read -r file; do
     id=$(basename "$file" .png)
-    echo "    {" >> "$json"
-    echo "      \"id\": \"${id}\"," >> "$json"
-    echo "      \"thumb\": \"${url}/thumbs/${id}.png\"," >> "$json"
-    echo "      \"url\": \"${url}/e#${id}.0\"" >> "$json"
-    echo "    }," >> "$json"
-  done
+    echo "{\"id\":\"$id\",\"thumb\":\"$url/thumbs/$id.png\",\"url\":\"$url/e#$id.0\"}"
+  done | jq -s '{
+    source: "glslsandbox",
+    updated: (now | strftime("%Y-%m-%dT%H:%M:%SZ")),
+    items: .
+  }' > "$json"
   
-  # Remove last comma and close array
-  sed -i '$ s/,$//' "$json"
-  echo "  ]" >> "$json"
-  echo "}" >> "$json"
+  local count=$(jq '.items | length' "$json")
+  echo "Generated $json with $count entries"
   
-  echo "Generated $json with $(jq '.items | length' "$json") entries"
+  if [[ $count -eq 0 ]]; then
+    echo -e "${c1}Error: Generated JSON has no items${c_}" >&2
+    return 1
+  fi
 }
 
 export -f job
-export now url out c{0..7} c_
+export url out c1 c2 c3 c6 c_
 
-# Table header
-echo -e "${c6} PAGE   ${c3} FILE            ${c2} JOB    ${c5} TIME   ${c4} TOTAL"
+echo -e "${c6} PAGE   ${c3} FILE            ${c2} STATUS${c_}"
+
+# Clear new file tracker
+> /tmp/glsl_found_new
 
 # Process pages
 for ((i = beg; i <= end; i++)); do
-  uri="${url}/?page=${i}"
-  echo -e "${c3} ${i} ${c7}···"
-  curl -s -f "$uri" |
+  echo -e "${c3}Page $i${c_}"
+  curl -s -f "${url}/?page=${i}" |
     sed -E '/thumb/!d;s/.*src=.(.*).png.*/\1.png/' |
     parallel --halt soon,fail=1 -j"$num" --line-buffer "job $i {}" || {
-    echo -e "${c1}Failed processing page $i${c_}" >&2
+    echo -e "${c1}Failed page $i${c_}" >&2
     continue
   }
 done
 
-# Generate JSON listing
-generate_json
+# Check if we found new files
+if [[ -s /tmp/glsl_found_new ]] || [[ ! -f "$json" ]]; then
+  if ! generate_json; then
+    echo -e "${c1}Error: Failed to generate valid JSON${c_}" >&2
+    exit 1
+  fi
+else
+  echo "No new files found, keeping existing JSON"
+fi
 
-# Final stats
-end=$(date +%s)
-printf "${c4}Total runtime: %dm%02ds${c_}\n" "$(((end - now)/60))" "$(((end - now)%60))"
+# Cleanup
+rm -f /tmp/glsl_found_new
 
-# vim: ft=bash 
+# Stats
+runtime=$(( $(date +%s) - start_time ))
+printf "${c3}Runtime: %dm%02ds${c_}\n" $((runtime / 60)) $((runtime % 60)) 
